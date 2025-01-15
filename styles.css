@@ -193,7 +193,22 @@ div#answerHistory {
     color: #34a853;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 1s ease-out, transform 1s ease-out;
+    transition: opacity .4s ease-out, transform 1s ease-out;
+    z-index: 1000;
+}
+/* TEMP SCORE DISPLAY */
+
+
+
+/* TEMP NAME DISPLAY */
+#tempNameDisplay {
+    position: relative;
+    top: -50px;
+    transform: translate(-50%, -50%);
+    font-size: large;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .5s ease-out, transform .5s ease-out;
     z-index: 1000;
 }
 /* TEMP SCORE DISPLAY */
