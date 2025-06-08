@@ -50,7 +50,6 @@ $(document).ready(function() {
     teamsBeta.set("MLB-MIN", new SportsTeam(['Twins'], 'Minnesota', 'MIN', 'MLB', false, false));
     teamsBeta.set("MLB-NYM", new SportsTeam(['Mets'], 'New York', 'NYM', 'MLB', true, false));
     teamsBeta.set("MLB-NYY", new SportsTeam(['Yankees'], 'New York', 'NYY', 'MLB', true, false));
-    teamsBeta.set("MLB-ATH", new SportsTeam(['Athletics', 'A\'s', 'As'], '', 'ATH', 'MLB', false, false));
     teamsBeta.set("MLB-PHI", new SportsTeam(['Phillies'], 'Philadelphia', 'PHI', 'MLB', false, false));
     teamsBeta.set("MLB-PIT", new SportsTeam(['Pirates'], 'Pittsburgh', 'PIT', 'MLB', false, false));
     teamsBeta.set("MLB-SD", new SportsTeam(['Padres'], 'San Diego', 'SD', 'MLB', false, true));
@@ -60,6 +59,7 @@ $(document).ready(function() {
     teamsBeta.set("MLB-TB", new SportsTeam(['Rays'], 'Tampa Bay', 'TB', 'MLB', false, true));
     teamsBeta.set("MLB-TEX", new SportsTeam(['Rangers'], 'Texas', 'TEX', 'MLB', false, false));
     teamsBeta.set("MLB-TOR", new SportsTeam(['Blue Jays'], 'Toronto', 'TOR', 'MLB', false, false));
+    teamsBeta.set("MLB-ATH", new SportsTeam(['Athletics', 'A\'s', 'As'], '', 'ATH', 'MLB', false, false));
     teamsBeta.set("MLB-WSH", new SportsTeam(['Nationals'], 'Washington', 'WSH', 'MLB', false, false));
 
     teamsBeta.set("NBA-ATL", new SportsTeam(['Hawks'], 'Atlanta', 'ATL', 'NBA', false, false));
@@ -127,7 +127,6 @@ $(document).ready(function() {
     teamsBeta.set("NFL-WAS", new SportsTeam(['Commanders'], 'Washington', 'WAS', 'NFL', false, false));
 
     teamsBeta.set("NHL-ANA", new SportsTeam(['Ducks'], 'Anaheim', 'ANA', 'NHL', true, false));
-    teamsBeta.set("NHL-UTA", new SportsTeam(['Hockey Club'], 'Utah', 'UTA', 'NHL', false, false));
     teamsBeta.set("NHL-BOS", new SportsTeam(['Bruins'], 'Boston', 'BOS', 'NHL', false, false));
     teamsBeta.set("NHL-BUF", new SportsTeam(['Sabres'], 'Buffalo', 'BUF', 'NHL', false, false));
     teamsBeta.set("NHL-CAR", new SportsTeam(['Hurricanes', 'Canes'], 'Carolina', 'CAR', 'NHL', false, false));
@@ -154,6 +153,7 @@ $(document).ready(function() {
     teamsBeta.set("NHL-STL", new SportsTeam(['Blues'], 'St. Louis', 'STL', 'NHL', false, false));
     teamsBeta.set("NHL-TBL", new SportsTeam(['Lightning', 'Bolts'], 'Tampa Bay', 'TBL', 'NHL', false, false));
     teamsBeta.set("NHL-TOR", new SportsTeam(['Maple Leafs', 'Leafs'], 'Toronto', 'TOR', 'NHL', false, false));
+    teamsBeta.set("NHL-UTA", new SportsTeam(['Mammoth'], 'Utah', 'UTA', 'NHL', false, false));
     teamsBeta.set("NHL-VAN", new SportsTeam(['Canucks'], 'Vancouver', 'VAN', 'NHL', false, false));
     teamsBeta.set("NHL-VGK", new SportsTeam(['Golden Knights'], 'Vegas', 'VGK', 'NHL', false, false));
     teamsBeta.set("NHL-WPG", new SportsTeam(['Jets'], 'Winnipeg', 'WPG', 'NHL', false, false));
