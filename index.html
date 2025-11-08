@@ -1,62 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sports Logos Quiz</title>
-        <link rel="stylesheet" href="./styles.css">
-    </head>
-    <body>
-        <div id="startScreen">
-            <div id="logoScroller"></div>
-            <h1>Welcome to the Sports Logo Quiz!</h1>
-            <p>You will be shown a logo and must type the team's name.</p>
-            <button id="startQuizButton">Start Quiz</button>
-            <div id="logoScroller2"></div>
-        </div>
-        <div class="content">
-            <div id="quizContainer">
-                <div id="answerHistory"></div>
-                <div class="question">
-                    <h3><p id="qNum"></p><p> / 124</p></h3>
-                    <div class="container">
-                        <div class="left">
-                            <button id="revLeg">Reveal League</button>
-                            <button id="revAbb">Reveal Abbreviation</button>
-                            <button id="idk">Don't Know</button>
-                        </div>
-                        <div class="middle">
-                            <div class="teamTitle">
-                                <p id="leagueDisplay"></p>
-                                <p id="abbreviationDisplay"></p>
-                                <p id="cityDisplay"></p>
-                                <p id="nameDisplay"></p>
-                            </div>
-                            <div id="imgContainer">
-                                <img id="logoImg" src="">
-                            </div>
-                            <input type="text" id="teamNameInput">
-                            <p id="tempNameDisplay"></p>
-                        </div>
-                        <div class="right">
-                            <div class="scoreContainer">
-                                <div id="scoreTooltip">Score:</div>
-                                <div id="scoreDisplay">0</div>
-                                <div id="tempScoreDisplay"></div>
-                            </div>
-                            <div class="scoreContainer2">
-                                <p id="averageTooltip"></p>
-                                <p id="averageDisplay"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="longScoreDisplay"></div>
-            </div>
-        </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sports Logos Quiz</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Start screen -->
+  <div id="startScreen">
+    <div id="logoScroller"></div>
+    <h1>Welcome to the Sports Logo Quiz!</h1>
+    <p>You will be shown a logo and must type the team's name.</p>
+    <button id="startQuizButton">Start Quiz</button>
+    <div id="logoScroller2"></div>
+  </div>
 
-        <!-- SCRIPT -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!-- jQuery -->
-        <script src="./script.js"></script>
-    </body>
+  <!-- Main content -->
+  <div class="content">
+    <div id="quizContainer">
+      <!-- Bars showing correct and incorrect answers -->
+      <div id="answerHistory"></div>
+
+      <!-- Main quiz -->
+      <div class="question">
+        <!-- Question number -->
+        <h3>
+          <p id="qNum"></p><p> / 124</p>
+        </h3>
+
+        <div class="container">
+          <!-- Left column: buttons -->
+          <div class="left">
+            <button id="revLeg">Reveal League</button>
+            <button id="revAbb">Reveal Abbreviation</button>
+            <button id="idk">Don't Know</button>
+          </div>
+          <!-- Middle column: logo & input -->
+          <div class="middle">
+            <!-- Title -->
+            <div class="teamTitle">
+              <p id="leagueDisplay"></p>
+              <p id="abbreviationDisplay"></p>
+              <p id="cityDisplay"></p>
+              <p id="nameDisplay"></p>
+            </div>
+            <!-- Logo -->
+            <div id="imgContainer">
+              <img id="logoImg" src="">
+            </div>
+            <!-- Input -->
+            <input type="text" id="teamNameInput">
+            <p id="tempNameDisplay"></p>
+          </div>
+          <!-- Right column: score -->
+          <div class="right">
+            <div class="scoreContainer">
+              <div id="scoreTooltip">Score:</div>
+              <div id="scoreDisplay">0</div>
+              <div id="tempScoreDisplay"></div>
+            </div>
+            <div class="scoreContainer2">
+              <p id="averageTooltip"></p>
+              <p id="averageDisplay"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar showing remaining time to answer -->
+      <div id="longScoreDisplay"></div>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> <!-- jQuery -->
+  <script src="./script.js"></script>
+</body>
+
 </html>
