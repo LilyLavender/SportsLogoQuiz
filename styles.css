@@ -802,6 +802,10 @@ div#answerHistory {
   width: 100%;
   pointer-events: all;
 }
+.lb-name-input::placeholder {
+  color: rgba(194, 65, 12, 0.45);
+  font-weight: 500;
+}
 
 #playAgainBtn {
   margin-top: 28px;
