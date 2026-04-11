@@ -299,6 +299,9 @@ $(document).ready(function() {
 
         $('#startScreen').hide();
         $('#teamNameInput').focus();
+        // Reset pause tracking so pre-quiz tab-switches don't skew avg time
+        totalPausedTime = 0;
+        pauseStartTime = null;
         quizStartTime = Date.now();
         createQuestion(currentTeamEntry.value[1], count);
     });
@@ -664,7 +667,7 @@ function renderLeagueBreakdown() {
 
     for (const lg of leagues) {
         const stats = leagueStats[lg];
-        const avgScore = stats.correct > 0 ? Math.round(stats.totalScore / stats.correct) : 0;
+        const avgScore = stats.correct > 0 ? (stats.totalScore / stats.correct).toFixed(2) : '—';
         const pctCorrect = stats.correct / stats.count * 100;
         const row = $('<div class="lbdRow"></div>');
         row.append(`<span class="lbdLeague">${lg}</span>`);
