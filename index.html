@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sports Logos Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -13,6 +16,7 @@
     <h1>Welcome to the Sports Logo Quiz!</h1>
     <p>You will be shown a logo and must type the team's name.</p>
     <button id="startQuizButton">Start Quiz</button>
+    <p id="highScoreStart"></p>
     <div id="logoScroller2"></div>
   </div>
 
@@ -32,9 +36,10 @@
         <div class="container">
           <!-- Left column: buttons -->
           <div class="left">
-            <button id="revLeg">Reveal League</button>
-            <button id="revAbb">Reveal Abbreviation</button>
+            <button id="revLeg">Reveal League <span class="hint-cost">−10s</span></button>
+            <button id="revAbb">Reveal Abbreviation <span class="hint-cost">−20s</span></button>
             <button id="idk">Don't Know</button>
+            <button id="restartBtn">Restart</button>
           </div>
           <!-- Middle column: logo & input -->
           <div class="middle">
@@ -50,18 +55,24 @@
               <img id="logoImg" src="">
             </div>
             <!-- Input -->
-            <input type="text" id="teamNameInput">
+            <div class="inputWrapper">
+              <input type="text" id="teamNameInput">
+              <div id="tempScoreDisplay"></div>
+            </div>
             <p id="tempNameDisplay"></p>
           </div>
           <!-- Right column: score -->
           <div class="right">
             <div class="scoreContainer">
-              <div id="scoreTooltip">Score:</div>
+              <div id="scoreTooltip">Score</div>
               <div id="scoreDisplay">0</div>
-              <div id="tempScoreDisplay"></div>
             </div>
             <div class="scoreContainer2">
-              <p id="averageTooltip"></p>
+              <div id="streakTooltip">Streak</div>
+              <div id="streakDisplay">0</div>
+            </div>
+            <div class="scoreContainer2" id="averageContainer" style="display:none">
+              <p id="averageTooltip">Avg / Q</p>
               <p id="averageDisplay"></p>
             </div>
           </div>
@@ -70,6 +81,36 @@
 
       <!-- Bar showing remaining time to answer -->
       <div id="longScoreDisplay"></div>
+    </div>
+  </div>
+
+  <!-- End screen -->
+  <div id="endScreen" style="display:none">
+    <div id="endCard">
+      <h1 id="endTitle">Quiz Complete!</h1>
+      <p id="newHighScoreMsg"></p>
+      <div class="endStats">
+        <div class="endStat">
+          <div class="endLabel">Final Score</div>
+          <div id="endFinalScore"></div>
+        </div>
+        <div class="endStat">
+          <div class="endLabel">Avg Time / Q</div>
+          <div id="endAverage"></div>
+        </div>
+      </div>
+      <div id="nameInputSection">
+        <p class="namePrompt">Enter your name for the leaderboard:</p>
+        <div class="nameInputRow">
+          <input type="text" id="playerNameInput" placeholder="Your name" maxlength="20">
+          <button id="submitNameBtn">Submit</button>
+        </div>
+      </div>
+      <div id="leaderboard" style="display:none">
+        <h2 class="leaderboardTitle">Top 10</h2>
+        <ol id="leaderboardList"></ol>
+      </div>
+      <button id="playAgainBtn">Play Again</button>
     </div>
   </div>
 
