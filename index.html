@@ -15,6 +15,13 @@
     <div id="logoScroller"></div>
     <h1>Welcome to the Sports Logo Quiz!</h1>
     <p>You will be shown a logo and must type the team's name.</p>
+    <div id="leagueSelector">
+      <button class="leagueToggle active" data-league="MLB">MLB</button>
+      <button class="leagueToggle active" data-league="NBA">NBA</button>
+      <button class="leagueToggle active" data-league="NFL">NFL</button>
+      <button class="leagueToggle active" data-league="NHL">NHL</button>
+    </div>
+    <p id="teamCountDisplay"></p>
     <button id="startQuizButton">Start Quiz</button>
     <p id="highScoreStart"></p>
     <div id="logoScroller2"></div>
@@ -30,7 +37,7 @@
       <div class="question">
         <!-- Question number -->
         <h3>
-          <p id="qNum"></p><p> / 124</p>
+          <p id="qNum"></p><p id="teamCountQuiz"> / 124</p>
         </h3>
 
         <div class="container">
@@ -99,6 +106,7 @@
           <div id="endAverage"></div>
         </div>
       </div>
+      <div id="leagueBreakdown"></div>
       <div id="nameInputSection">
         <p class="namePrompt">Enter your name for the leaderboard:</p>
         <div class="nameInputRow">

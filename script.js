@@ -29,6 +29,9 @@ let paused = false;
 let quizStartTime = 0;
 let totalPausedTime = 0;
 let pauseStartTime = null;
+let leagueStats = {};
+let selectedLeagues = new Set(['MLB', 'NBA', 'NFL', 'NHL']);
+const leagueCounts = { MLB: 30, NBA: 30, NFL: 32, NHL: 32 };
 
 $(document).ready(function() {
     $('#endScreen').hide();
@@ -163,13 +166,12 @@ $(document).ready(function() {
     teamsBeta.set("NHL-WPG", new SportsTeam(['Jets'], 'Winnipeg', 'WPG', 'NHL', false, false));
     teamsBeta.set("NHL-WSH", new SportsTeam(['Capitals', 'Caps'], 'Washington', 'WSH', 'NHL', false, false));
     
-    // Randomize teams
-    const teams = shuffleMap(teamsBeta);
-    const teamsLoading = shuffleMap(teams);
+    // Randomize teams for logo scroller
+    const teamsLoading = shuffleMap(teamsBeta);
 
-    // Important vars
-    let teamIterator = teams.entries();
-    let currentTeamEntry = teamIterator.next();
+    // Important vars (iterator is initialized when quiz starts)
+    let teamIterator;
+    let currentTeamEntry;
     let count = 1;
     let streak = 0;
 
@@ -190,11 +192,23 @@ $(document).ready(function() {
         }
     });
 
-    // Top score on start screen
-    const topScores = getHighScores();
-    if (topScores.length > 0) {
-        $('#highScoreStart').text(`Best: ${topScores[0].score} (${topScores[0].name})`);
-    }
+    // Team count and high score on start screen
+    updateTeamCountDisplay();
+
+    // League toggle buttons
+    $('.leagueToggle').on('click', function() {
+        const lg = $(this).data('league');
+        if (selectedLeagues.has(lg)) {
+            if (selectedLeagues.size > 1) {
+                selectedLeagues.delete(lg);
+                $(this).removeClass('active');
+            }
+        } else {
+            selectedLeagues.add(lg);
+            $(this).addClass('active');
+        }
+        updateTeamCountDisplay();
+    });
 
     // Restart / play again
     $('#restartBtn').on('click', () => location.reload());
@@ -257,6 +271,32 @@ $(document).ready(function() {
 
     // Start quiz
     $('#startQuizButton').on('click', function() {
+        // Filter and shuffle teams by selected leagues
+        const filteredEntries = [];
+        for (const [key, team] of teamsBeta) {
+            if (selectedLeagues.has(team.getLeauge)) filteredEntries.push([key, team]);
+        }
+        for (let i = filteredEntries.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [filteredEntries[i], filteredEntries[j]] = [filteredEntries[j], filteredEntries[i]];
+        }
+        const filteredTeams = new Map(filteredEntries);
+
+        // Update quiz counter
+        $('#teamCountQuiz').text(` / ${filteredTeams.size}`);
+
+        // Initialize per-league stats
+        leagueStats = {};
+        for (const lg of selectedLeagues) {
+            leagueStats[lg] = { correct: 0, missed: 0, totalScore: 0, count: leagueCounts[lg] };
+        }
+
+        // Initialize iterator
+        teamIterator = filteredTeams.entries();
+        currentTeamEntry = teamIterator.next();
+        count = 1;
+        streak = 0;
+
         $('#startScreen').hide();
         $('#teamNameInput').focus();
         quizStartTime = Date.now();
@@ -278,34 +318,41 @@ $(document).ready(function() {
             const totalElapsed = (Date.now() - quizStartTime - totalPausedTime) / 1000;
             const avgTime = totalElapsed / count;
 
-            // Check if new top score before name entry
-            const prevScores = getHighScores();
-            const isNewHigh = prevScores.length === 0 || totalScore > prevScores[0].score;
+            // Determine leaderboard key (null = mixed, no leaderboard)
+            const key = getLeaderboardKey();
+            const prevScores = key ? getHighScores(key) : [];
+            const isNewHigh = key && (prevScores.length === 0 || totalScore > prevScores[0].score);
 
             // Populate end screen
             $('#endFinalScore').text(totalScore);
             $('#endAverage').text(avgTime.toFixed(1) + 's');
             if (isNewHigh) $('#newHighScoreMsg').text('New High Score!');
+            renderLeagueBreakdown();
             $('#endScreen').show();
-            $('#playerNameInput').focus();
 
-            // Name submission
-            function submitName() {
-                const name = $('#playerNameInput').val().trim() || 'Anonymous';
-                const scores = saveHighScore(name, totalScore);
-                renderLeaderboard(scores, name, totalScore);
+            if (key) {
+                $('#playerNameInput').focus();
+                // Name submission
+                function submitName() {
+                    const name = $('#playerNameInput').val().trim() || 'Anonymous';
+                    const scores = saveHighScore(name, totalScore, key);
+                    renderLeaderboard(scores, name, totalScore);
+                    $('#nameInputSection').hide();
+                    $('#leaderboard').show();
+                }
+                $('#submitNameBtn').off('click').on('click', submitName);
+                $('#playerNameInput').off('keydown').on('keydown', function(e) {
+                    if (e.key === 'Enter') submitName();
+                });
+                // Auto-submit as Anonymous if Play Again clicked without entering name
+                $('#playAgainBtn').off('click').on('click', function() {
+                    if ($('#nameInputSection').is(':visible')) submitName();
+                    location.reload();
+                });
+            } else {
+                // No leaderboard for mixed league selection
                 $('#nameInputSection').hide();
-                $('#leaderboard').show();
             }
-            $('#submitNameBtn').off('click').on('click', submitName);
-            $('#playerNameInput').off('keydown').on('keydown', function(e) {
-                if (e.key === 'Enter') submitName();
-            });
-            // Auto-submit as Anonymous if Play Again clicked without entering name
-            $('#playAgainBtn').off('click').on('click', function() {
-                if ($('#nameInputSection').is(':visible')) submitName();
-                location.reload();
-            });
         }
     }
 
@@ -345,7 +392,7 @@ $(document).ready(function() {
                         lockBox = false;
                         streak = 0;
                         updateStreakDisplay();
-                        addToAnswerHistory(5);
+                        addToAnswerHistory(5, team.getLeauge, 0);
                         handleNextTeam();
                     }, 2500);
                 }
@@ -410,21 +457,22 @@ $(document).ready(function() {
             if (showCanonicalName) {
                 showTempNameDisplay(team.getNames[0]);
             }
+            const rawScore = tempScore;
             if (tempScore === 100) {
                 streak++;
-                addToAnswerHistory(0);
+                addToAnswerHistory(0, team.getLeauge, rawScore);
             } else if (tempScore >= 98) {
                 streak++;
-                addToAnswerHistory(1);
+                addToAnswerHistory(1, team.getLeauge, rawScore);
             } else if (tempScore >= 70) {
                 streak++;
-                addToAnswerHistory(2);
+                addToAnswerHistory(2, team.getLeauge, rawScore);
             } else if (tempScore >= 30) {
                 streak = 0;
-                addToAnswerHistory(3);
+                addToAnswerHistory(3, team.getLeauge, rawScore);
             } else {
                 streak = 0;
-                addToAnswerHistory(4);
+                addToAnswerHistory(4, team.getLeauge, rawScore);
             }
             updateStreakDisplay();
             if (streak >= 120) {
@@ -464,7 +512,7 @@ $(document).ready(function() {
                     lockBox = false;
                     streak = 0;
                     updateStreakDisplay();
-                    addToAnswerHistory(5);
+                    addToAnswerHistory(5, team.getLeauge, 0);
                     handleNextTeam();
                 }, 2000);
             }
@@ -533,7 +581,17 @@ function updateLongScoreDisplay(score) {
 }
 
 // Add to answer history helper
-function addToAnswerHistory(stage) {
+function addToAnswerHistory(stage, league, rawScore) {
+    // Accumulate per-league stats
+    if (league && leagueStats[league] !== undefined) {
+        if (stage === 5) {
+            leagueStats[league].missed++;
+        } else {
+            leagueStats[league].correct++;
+            leagueStats[league].totalScore += rawScore || 0;
+        }
+    }
+
     var color = "";
     switch (stage) {
         case (0): color = "#8a46c6"; break;
@@ -551,21 +609,69 @@ function addToAnswerHistory(stage) {
 }
 
 // High score leaderboard helpers
-function getHighScores() {
+function getHighScores(key) {
+    const storageKey = key || 'highScores';
     try {
-        return JSON.parse(localStorage.getItem('highScores') || '[]');
+        return JSON.parse(localStorage.getItem(storageKey) || '[]');
     } catch(e) {
         return [];
     }
 }
 
-function saveHighScore(name, score) {
-    const scores = getHighScores();
+function saveHighScore(name, score, key) {
+    const storageKey = key || 'highScores';
+    const scores = getHighScores(storageKey);
     scores.push({ name: name || 'Anonymous', score });
     scores.sort((a, b) => b.score - a.score);
     scores.splice(10);
-    localStorage.setItem('highScores', JSON.stringify(scores));
+    localStorage.setItem(storageKey, JSON.stringify(scores));
     return scores;
+}
+
+function getLeaderboardKey() {
+    if (selectedLeagues.size === 4) return 'highScores';
+    if (selectedLeagues.size === 1) return 'highScores_' + [...selectedLeagues][0];
+    return null;
+}
+
+function updateStartScreenHighScore() {
+    const key = getLeaderboardKey();
+    if (!key) {
+        $('#highScoreStart').text('Select all or one league to save scores');
+        return;
+    }
+    const topScores = getHighScores(key);
+    if (topScores.length > 0) {
+        $('#highScoreStart').text(`Best: ${topScores[0].score} (${topScores[0].name})`);
+    } else {
+        $('#highScoreStart').text('');
+    }
+}
+
+function updateTeamCountDisplay() {
+    let total = 0;
+    for (const lg of selectedLeagues) total += leagueCounts[lg];
+    $('#teamCountDisplay').text(`${total} teams selected`);
+    updateStartScreenHighScore();
+}
+
+function renderLeagueBreakdown() {
+    const container = $('#leagueBreakdown').empty();
+    const leagues = Object.keys(leagueStats);
+    if (leagues.length === 0) return;
+
+    $('<div class="lbdTitle">League Breakdown</div>').appendTo(container);
+
+    for (const lg of leagues) {
+        const stats = leagueStats[lg];
+        const avgScore = stats.correct > 0 ? Math.round(stats.totalScore / stats.correct) : 0;
+        const pctCorrect = stats.correct / stats.count * 100;
+        const row = $('<div class="lbdRow"></div>');
+        row.append(`<span class="lbdLeague">${lg}</span>`);
+        row.append(`<div class="lbdBarWrap"><div class="lbdBar" style="width:${pctCorrect.toFixed(1)}%"></div></div>`);
+        row.append(`<span class="lbdInfo">${stats.correct}/${stats.count} · avg ${avgScore}</span>`);
+        container.append(row);
+    }
 }
 
 function renderLeaderboard(scores, newName, newScore) {
