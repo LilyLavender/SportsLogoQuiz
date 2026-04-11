@@ -14,7 +14,8 @@ class SportsTeam {
     }
 
     getImageSrc() {
-        return this.imageUrl || ("img/" + this.generateFileName());
+        if (this.imageUrl) return 'https://images.weserv.nl/?url=' + encodeURIComponent(this.imageUrl);
+        return 'img/' + this.generateFileName();
     }
 
     get getNames() { return this.names; }
