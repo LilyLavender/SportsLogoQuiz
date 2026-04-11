@@ -30,7 +30,8 @@ let quizStartTime = 0;
 let totalPausedTime = 0;
 let pauseStartTime = null;
 let leagueStats = {};
-let selectedLeagues = new Set(['MLB', 'NBA', 'NFL', 'NHL']);
+const _savedLeagues = JSON.parse(localStorage.getItem('selectedLeagues') || 'null');
+let selectedLeagues = new Set(_savedLeagues && _savedLeagues.length ? _savedLeagues : ['MLB', 'NBA', 'NFL', 'NHL']);
 const leagueCounts = { MLB: 30, NBA: 30, NFL: 32, NHL: 32 };
 
 $(document).ready(function() {
@@ -67,7 +68,7 @@ $(document).ready(function() {
     teamsBeta.set("MLB-TEX", new SportsTeam(['Rangers'], 'Texas', 'TEX', 'MLB', false, false));
     teamsBeta.set("MLB-TOR", new SportsTeam(['Blue Jays'], 'Toronto', 'TOR', 'MLB', false, false));
     teamsBeta.set("MLB-ATH", new SportsTeam(['Athletics', 'A\'s', 'As'], '', 'ATH', 'MLB', false, false));
-    teamsBeta.set("MLB-WSH", new SportsTeam(['Nationals'], 'Washington', 'WSH', 'MLB', false, false));
+    teamsBeta.set("MLB-WSH", new SportsTeam(['Nationals', 'Nats'], 'Washington', 'WSH', 'MLB', false, false));
 
     teamsBeta.set("NBA-ATL", new SportsTeam(['Hawks'], 'Atlanta', 'ATL', 'NBA', false, false));
     teamsBeta.set("NBA-BKN", new SportsTeam(['Nets'], 'Brooklyn', 'BKN', 'NBA', true, false));
@@ -166,9 +167,6 @@ $(document).ready(function() {
     teamsBeta.set("NHL-WPG", new SportsTeam(['Jets'], 'Winnipeg', 'WPG', 'NHL', false, false));
     teamsBeta.set("NHL-WSH", new SportsTeam(['Capitals', 'Caps'], 'Washington', 'WSH', 'NHL', false, false));
     
-    // Randomize teams for logo scroller
-    const teamsLoading = shuffleMap(teamsBeta);
-
     // Important vars (iterator is initialized when quiz starts)
     let teamIterator;
     let currentTeamEntry;
@@ -195,6 +193,11 @@ $(document).ready(function() {
     // Team count and high score on start screen
     updateTeamCountDisplay();
 
+    // Sync button states with saved league preferences
+    $('.leagueToggle').each(function() {
+        if (!selectedLeagues.has($(this).data('league'))) $(this).removeClass('active');
+    });
+
     // League toggle buttons
     $('.leagueToggle').on('click', function() {
         const lg = $(this).data('league');
@@ -207,67 +210,47 @@ $(document).ready(function() {
             selectedLeagues.add(lg);
             $(this).addClass('active');
         }
+        localStorage.setItem('selectedLeagues', JSON.stringify([...selectedLeagues]));
         updateTeamCountDisplay();
+        buildScrollers();
     });
 
     // Restart / play again
     $('#restartBtn').on('click', () => location.reload());
     $('#playAgainBtn').on('click', () => location.reload());
 
-    // Logo scrollers
-    const logoScroller = $('#logoScroller');
-    const logoScroller2 = $('#logoScroller2');
-    let logos = [];
-    let logos2 = [];
-    let counter = 0;
-    for (let [key, team] of teamsLoading) {
-        if (counter < 20) {
-            let fileName = "img/" + team.generateFileName();
-            logos.push(`<img src="${fileName}" alt="${team.getNames[0]}">`);
-            counter++;
-        } else if (counter < 40) {
-            let fileName = "img/" + team.generateFileName();
-            logos2.push(`<img src="${fileName}" alt="${team.getNames[0]}">`);
-            counter++;
-        } else {
-            break;
-        }
-    }
-    logoScroller.html(logos.join(''));
-    logoScroller2.html(logos2.join(''));
-    logoScroller.append(logoScroller.html());
-    logoScroller2.append(logoScroller2.html());
+    // Build background scrollers from teams in selected leagues
+    function buildScrollers() {
+        const filtered = Array.from(teamsBeta.values())
+            .filter(t => selectedLeagues.has(t.getLeauge));
 
-    // Auto-scroll scrollers
-    let scrollSpeed = 0.3;
-    let scrollAmount = 0;
-    let scrollAmount2 = 0;
-
-    // This is very poorly optimized and should be redone at some point lmao
-    function autoScroll() {
-        scrollAmount += scrollSpeed;
-        logoScroller.scrollLeft(scrollAmount);
-
-        if (scrollAmount >= logoScroller[0].scrollWidth / 2) {
-            scrollAmount = 0;
+        // Shuffle
+        const shuffled = [...filtered];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
 
-        requestAnimationFrame(autoScroll);
+        // Distribute into 3 rows round-robin
+        const rows = [[], [], []];
+        shuffled.forEach((team, i) => rows[i % 3].push(team));
+
+        ['#row1', '#row2', '#row3'].forEach((sel, ri) => {
+            let rowTeams = [...rows[ri]];
+            // Pad so one copy is wide enough to fill any viewport (min 40 logos)
+            while (rowTeams.length < 40) rowTeams = [...rowTeams, ...rows[ri]];
+            // Duplicate for seamless loop
+            const loopTeams = [...rowTeams, ...rowTeams];
+            const html = loopTeams.map(team => {
+                const delay = (Math.random() * 3).toFixed(2);
+                const dur = (2.0 + Math.random() * 1.2).toFixed(2);
+                return `<img src="img/${team.generateFileName()}" alt="" style="animation-delay:${delay}s;animation-duration:${dur}s">`;
+            }).join('');
+            $(`${sel} .scrollTrack`).html(html);
+        });
     }
 
-    function autoScroll2() {
-        scrollAmount2 -= scrollSpeed;
-        logoScroller2.scrollLeft(scrollAmount2);
-
-        if (scrollAmount2 <= 0) {
-            scrollAmount2 = logoScroller2[0].scrollWidth / 2;
-        }
-
-        requestAnimationFrame(autoScroll2);
-    }
-
-    autoScroll();
-    autoScroll2();
+    buildScrollers();
 
     // Start quiz
     $('#startQuizButton').on('click', function() {
@@ -321,41 +304,20 @@ $(document).ready(function() {
             const totalElapsed = (Date.now() - quizStartTime - totalPausedTime) / 1000;
             const avgTime = totalElapsed / count;
 
-            // Determine leaderboard key (null = mixed, no leaderboard)
             const key = getLeaderboardKey();
-            const prevScores = key ? getHighScores(key) : [];
-            const isNewHigh = key && (prevScores.length === 0 || totalScore > prevScores[0].score);
+            const prevScores = getHighScores(key);
+            const isNewHigh = prevScores.length === 0 || totalScore > prevScores[0].score;
 
-            // Populate end screen
+            // Auto-save score then populate end screen
+            const scores = saveHighScore('Anonymous', totalScore, key);
+            const editIndex = scores.findIndex(e => e.name === 'Anonymous' && e.score === totalScore);
             $('#endFinalScore').text(totalScore);
-            $('#endAverage').text(avgTime.toFixed(1) + 's');
+            $('#endAverage').text(avgTime.toFixed(2) + 's');
             if (isNewHigh) $('#newHighScoreMsg').text('New High Score!');
             renderLeagueBreakdown();
+            renderLeaderboard(scores, editIndex >= 0 ? editIndex : null, key);
+            $('#leaderboard').show();
             $('#endScreen').show();
-
-            if (key) {
-                $('#playerNameInput').focus();
-                // Name submission
-                function submitName() {
-                    const name = $('#playerNameInput').val().trim() || 'Anonymous';
-                    const scores = saveHighScore(name, totalScore, key);
-                    renderLeaderboard(scores, name, totalScore);
-                    $('#nameInputSection').hide();
-                    $('#leaderboard').show();
-                }
-                $('#submitNameBtn').off('click').on('click', submitName);
-                $('#playerNameInput').off('keydown').on('keydown', function(e) {
-                    if (e.key === 'Enter') submitName();
-                });
-                // Auto-submit as Anonymous if Play Again clicked without entering name
-                $('#playAgainBtn').off('click').on('click', function() {
-                    if ($('#nameInputSection').is(':visible')) submitName();
-                    location.reload();
-                });
-            } else {
-                // No leaderboard for mixed league selection
-                $('#nameInputSection').hide();
-            }
         }
     }
 
@@ -632,23 +594,25 @@ function saveHighScore(name, score, key) {
 }
 
 function getLeaderboardKey() {
-    if (selectedLeagues.size === 4) return 'highScores';
-    if (selectedLeagues.size === 1) return 'highScores_' + [...selectedLeagues][0];
-    return null;
+    return 'highScores_' + [...selectedLeagues].sort().join('_');
 }
 
 function updateStartScreenHighScore() {
     const key = getLeaderboardKey();
-    if (!key) {
-        $('#highScoreStart').text('Select all or one league to save scores');
-        return;
-    }
-    const topScores = getHighScores(key);
-    if (topScores.length > 0) {
-        $('#highScoreStart').text(`Best: ${topScores[0].score} (${topScores[0].name})`);
-    } else {
-        $('#highScoreStart').text('');
-    }
+    const scores = getHighScores(key);
+    const container = $('#startLeaderboard').empty();
+    if (scores.length === 0) return;
+
+    container.append('<div class="lb-title">Top Scores</div>');
+    const ol = $('<ol></ol>');
+    scores.forEach((entry, i) => {
+        ol.append(`<li>
+            <span class="lb-rank">${i + 1}</span>
+            <span class="lb-name">${entry.name}</span>
+            <span class="lb-score">${entry.score}</span>
+        </li>`);
+    });
+    container.append(ol);
 }
 
 function updateTeamCountDisplay() {
@@ -677,15 +641,42 @@ function renderLeagueBreakdown() {
     }
 }
 
-function renderLeaderboard(scores, newName, newScore) {
+function renderLeaderboard(scores, editIndex, key) {
     const list = $('#leaderboardList').empty();
     scores.forEach(function(entry, i) {
-        const isNew = entry.name === newName && entry.score === newScore && i === scores.findIndex(e => e.name === newName && e.score === newScore);
+        const isNew = i === editIndex;
+        const nameCell = isNew
+            ? `<input class="lb-name-input" type="text" value="Anonymous" maxlength="20" autocomplete="off">`
+            : `<span class="lb-name">${entry.name}</span>`;
         const li = $(`<li class="${isNew ? 'lb-entry-new' : ''}">
             <span class="lb-rank">${i + 1}</span>
-            <span class="lb-name">${entry.name}</span>
+            ${nameCell}
             <span class="lb-score">${entry.score}</span>
         </li>`);
         list.append(li);
     });
+
+    if (editIndex !== null && editIndex >= 0) {
+        const input = $('#leaderboardList .lb-name-input');
+        input.focus().select();
+
+        function commitName() {
+            const newName = input.val().trim() || 'Anonymous';
+            const stored = getHighScores(key);
+            if (stored[editIndex]) {
+                stored[editIndex].name = newName;
+                localStorage.setItem(key, JSON.stringify(stored));
+            }
+            input.replaceWith(`<span class="lb-name lb-entry-new">${newName}</span>`);
+            updateStartScreenHighScore();
+        }
+
+        input.on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                input.off('blur');
+                commitName();
+            }
+        });
+        input.on('blur', commitName);
+    }
 }

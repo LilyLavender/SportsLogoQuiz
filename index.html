@@ -12,19 +12,24 @@
 <body>
   <!-- Start screen -->
   <div id="startScreen">
-    <div id="logoScroller"></div>
-    <h1>Welcome to the Sports Logo Quiz!</h1>
-    <p>You will be shown a logo and must type the team's name.</p>
-    <div id="leagueSelector">
-      <button class="leagueToggle active" data-league="MLB">MLB</button>
-      <button class="leagueToggle active" data-league="NBA">NBA</button>
-      <button class="leagueToggle active" data-league="NFL">NFL</button>
-      <button class="leagueToggle active" data-league="NHL">NHL</button>
+    <div id="startBg">
+      <div class="scrollRow" id="row1"><div class="scrollTrack"></div></div>
+      <div class="scrollRow" id="row2"><div class="scrollTrack"></div></div>
+      <div class="scrollRow" id="row3"><div class="scrollTrack"></div></div>
     </div>
-    <p id="teamCountDisplay"></p>
-    <button id="startQuizButton">Start Quiz</button>
-    <p id="highScoreStart"></p>
-    <div id="logoScroller2"></div>
+    <div id="startContent">
+      <h1>Sports Logo Quiz</h1>
+      <p>How well do you know your teams? Type the name & beat the clock.</p>
+      <div id="leagueSelector">
+        <button class="leagueToggle active" data-league="MLB">MLB</button>
+        <button class="leagueToggle active" data-league="NBA">NBA</button>
+        <button class="leagueToggle active" data-league="NFL">NFL</button>
+        <button class="leagueToggle active" data-league="NHL">NHL</button>
+      </div>
+      <p id="teamCountDisplay"></p>
+      <button id="startQuizButton">Start Quiz</button>
+      <div id="startLeaderboard"></div>
+    </div>
   </div>
 
   <!-- Main content -->
@@ -63,7 +68,7 @@
             </div>
             <!-- Input -->
             <div class="inputWrapper">
-              <input type="text" id="teamNameInput">
+              <input type="text" id="teamNameInput" autocomplete="off">
               <div id="tempScoreDisplay"></div>
             </div>
             <p id="tempNameDisplay"></p>
@@ -107,13 +112,6 @@
         </div>
       </div>
       <div id="leagueBreakdown"></div>
-      <div id="nameInputSection">
-        <p class="namePrompt">Enter your name for the leaderboard:</p>
-        <div class="nameInputRow">
-          <input type="text" id="playerNameInput" placeholder="Your name" maxlength="20">
-          <button id="submitNameBtn">Submit</button>
-        </div>
-      </div>
       <div id="leaderboard" style="display:none">
         <h2 class="leaderboardTitle">Top 10</h2>
         <ol id="leaderboardList"></ol>

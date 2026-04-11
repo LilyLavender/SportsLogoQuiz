@@ -10,8 +10,12 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
-  min-height: 100vh;
   background: linear-gradient(135deg, #150503 0%, #2d0a00 55%, #5c1a00 100%);
   background-attachment: fixed;
 }
@@ -23,14 +27,16 @@ div.content {
   margin: 0 auto;
   max-width: var(--site-width);
   padding: 0 20px;
+  height: 100vh;
+  display: flex;
+  align-items: center;
 }
 
 div#quizContainer {
   display: flex;
   flex-direction: column;
   height: fit-content;
-  margin-top: 160px;
-  margin-bottom: 60px;
+  width: 100%;
   border-radius: 10px;
   background-color: #ffffff;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.12);
@@ -217,23 +223,6 @@ input:focus {
   outline: none;
 }
 
-#playerNameInput {
-  width: 180px;
-  max-width: 180px;
-  margin-top: 0;
-  padding: 9px 14px;
-  background-color: #f9fafb;
-  font-size: 0.95em;
-  font-weight: 500;
-  border-radius: 6px;
-  color: #1e1b4b;
-  box-shadow: inset 0 0 0 2px #e5e7eb;
-}
-
-#playerNameInput:focus {
-  background-color: #ffffff;
-  box-shadow: inset 0 0 0 2px #ea580c, 0 0 0 3px rgba(234, 88, 12, 0.15);
-}
 /* INPUT */
 
 
@@ -290,11 +279,41 @@ input:focus {
   color: #1e1b4b;
 }
 
-#highScoreStart {
-  font-size: 0.85em;
-  color: rgba(255, 255, 255, 0.55);
-  margin-top: 12px;
+#startLeaderboard {
+  margin-top: 20px;
+  width: 260px;
 }
+
+#startLeaderboard .lb-title {
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+#startLeaderboard ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#startLeaderboard li {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.88em;
+  gap: 8px;
+}
+
+#startLeaderboard li:last-child { border-bottom: none; }
+
+#startLeaderboard .lb-rank { color: rgba(255, 255, 255, 0.25); }
+#startLeaderboard .lb-name { color: rgba(255, 255, 255, 0.75); }
+#startLeaderboard .lb-score { color: #fb923c; }
 
 div#longScoreDisplay {
   height: 10px;
@@ -428,7 +447,15 @@ div#answerHistory {
   letter-spacing: -0.02em;
 }
 
-#startScreen > p {
+#startContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#startContent > p {
   font-size: 1.1em;
   margin-bottom: 36px;
   color: rgba(255, 255, 255, 0.65);
@@ -512,45 +539,62 @@ div#answerHistory {
 
 
 
-/* START SCREEN LOGO SCROLLERS */
-#logoScroller {
-  display: flex;
+/* START SCREEN SCROLLERS */
+#startBg {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  white-space: nowrap;
-  padding: 10px;
-  margin-bottom: 20px;
-  width: 110%;
-  position: relative;
-  transform: rotate(-4deg);
-  top: -150px;
-  left: -5px;
-  opacity: 40%;
+  pointer-events: none;
+  z-index: 0;
 }
 
-#logoScroller2 {
-  display: flex;
+.scrollRow {
+  position: absolute;
+  width: 114%;
+  left: -7%;
+  transform: rotate(-4deg);
   overflow: hidden;
-  white-space: nowrap;
-  padding: 10px;
-  margin-bottom: 20px;
-  width: 110%;
-  position: relative;
-  transform: rotate(-4deg);
-  top: 150px;
-  left: -5px;
-  opacity: 40%;
 }
 
-#logoScroller img, #logoScroller2 img {
-  height: 100px;
-  margin-right: 20px;
-  transition: transform 0.3s;
+#row1 { top: 5%; }
+#row2 { top: 44%; }
+#row3 { top: 78%; }
+
+.scrollTrack {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: 20px;
+  padding: 10px 0;
+  opacity: 0.38;
 }
 
-#logoScroller img:hover, #logoScroller2 img:hover {
-  transform: scale(1.1);
+#row1 .scrollTrack { animation: scrollLeft 120s linear infinite; }
+#row2 .scrollTrack { animation: scrollRight 130s linear infinite; }
+#row3 .scrollTrack { animation: scrollLeft 110s linear infinite; }
+
+.scrollTrack img {
+  height: 90px;
+  flex-shrink: 0;
+  object-fit: contain;
+  animation: bob 2.5s ease-in-out infinite;
 }
-/* START SCREEN LOGO SCROLLERS */
+
+@keyframes scrollLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes scrollRight {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-9px); }
+}
+/* START SCREEN SCROLLERS */
 
 
 
@@ -631,37 +675,6 @@ div#answerHistory {
   margin: 8px 0 20px;
 }
 
-.namePrompt {
-  font-size: 0.85em;
-  color: #6b7280;
-  margin-bottom: 10px;
-  font-weight: 500;
-}
-
-.nameInputRow {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  align-items: center;
-}
-
-#submitNameBtn {
-  padding: 9px 18px;
-  font-size: 0.9em;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: #ea580c;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: filter 0.12s ease;
-}
-
-#submitNameBtn:hover { filter: brightness(110%); }
-#submitNameBtn:active { filter: brightness(90%); }
-
-#nameInputSection {
-  margin-bottom: 8px;
-}
 
 #leagueBreakdown {
   margin: 4px 0 16px;
@@ -770,6 +783,24 @@ div#answerHistory {
 .lb-entry-new .lb-name,
 .lb-entry-new .lb-score {
   color: #c2410c;
+}
+
+.lb-name-input {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #c2410c;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid #ea580c;
+  border-radius: 0;
+  padding: 0 0 1px;
+  outline: none;
+  box-shadow: none;
+  min-width: 0;
+  width: 100%;
+  pointer-events: all;
 }
 
 #playAgainBtn {
