@@ -86,14 +86,14 @@ $(document).ready(function() {
     teamsBeta.set("NBA-DEN", new SportsTeam(['Nuggets'], 'Denver', 'DEN', 'NBA', true, false));
     teamsBeta.set("NBA-DET", new SportsTeam(['Pistons'], 'Detroit', 'DET', 'NBA', true, false));
     teamsBeta.set("NBA-GSW", new SportsTeam(['Warriors'], 'Golden State', 'GSW', 'NBA', false, false, 'https://content.sportslogos.net/logos/6/235/full/4782_golden_state_warriors-alternate-2020.png'));
-    teamsBeta.set("NBA-HOU", new SportsTeam(['Rockets'], 'Houston', 'HOU', 'NBA', false, false, 'https://content.sportslogos.net/logos/6/230/full/9260_houston_rockets-alternate-2020.png'));
+    teamsBeta.set("NBA-HOU", new SportsTeam(['Rockets'], 'Houston', 'HOU', 'NBA', false, false, 'https://content.sportslogos.net/logos/6/230/full/houston-rockets-alternate-logo-2027-23033212027.png'));
     teamsBeta.set("NBA-IND", new SportsTeam(['Pacers'], 'Indiana', 'IND', 'NBA', true, false, 'https://content.sportslogos.net/logos/6/224/full/indiana-pacers-alternate-logo-2026-22443882026.png'));
     teamsBeta.set("NBA-LAC", new SportsTeam(['Clippers'], 'Los Angeles', 'LAC', 'NBA', true, false));
     teamsBeta.set("NBA-LAL", new SportsTeam(['Lakers'], 'Los Angeles', 'LAL', 'NBA', true, false));
     teamsBeta.set("NBA-MEM", new SportsTeam(['Grizzlies'], 'Memphis', 'MEM', 'NBA', false, false));
     teamsBeta.set("NBA-MIA", new SportsTeam(['Heat'], 'Miami', 'MIA', 'NBA', true, false));
     teamsBeta.set("NBA-MIL", new SportsTeam(['Bucks'], 'Milwaukee', 'MIL', 'NBA', false, false, 'https://content.sportslogos.net/logos/6/225/full/milwaukee_bucks_logo_alternate_20169034.png'));
-    teamsBeta.set("NBA-MIN", new SportsTeam(['Timberwolves', 'Wolves'], 'Minnesota', 'MIN', 'NBA', true, false));
+    teamsBeta.set("NBA-MIN", new SportsTeam(['Timberwolves', 'Wolves'], 'Minnesota', 'MIN', 'NBA', true, false, 'https://content.sportslogos.net/logos/6/232/full/minnesota-timberwolves-alternate-logo-2027-23224552027.png'));
     teamsBeta.set("NBA-NOP", new SportsTeam(['Pelicans'], 'New Orleans', 'NOP', 'NBA', true, false));
     teamsBeta.set("NBA-NYK", new SportsTeam(['Knicks', 'Knickerbockers'], 'New York', 'NYK', 'NBA', true, false));
     teamsBeta.set("NBA-OKC", new SportsTeam(['Thunder'], 'Oklahoma City', 'OKC', 'NBA', true, true, 'https://content.sportslogos.net/logos/6/2687/full/oklahoma-city-thunder-partial-logo-2009-1140.png'));
